@@ -17,7 +17,7 @@ class blk(gr.sync_block):
             out_sig=[np.float32]
         )
         self.message = "CQ CQ DE BEACON"
-        self.samp_rate = 1e6   # Должно совпадать с samp_rate в flowgraph
+        self.samp_rate = 1e6
         self.morse = {
             'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.',
             'G':'--.','H':'....','I':'..','J':'.---','K':'-.-','L':'.-..',
@@ -54,8 +54,8 @@ class blk(gr.sync_block):
                     out.extend([1.0] * self.dot_samples)
                 elif sym == '-':
                     out.extend([1.0] * self.dot_samples * 3)
-                out.extend([0.0] * self.dot_samples)   # межсимвольный интервал
-            out.extend([0.0] * self.dot_samples * 2)   # межбуквенный интервал
+                out.extend([0.0] * self.dot_samples)
+            out.extend([0.0] * self.dot_samples * 2)
         return np.array(out, dtype=np.float32)
 
     def work(self, input_items, output_items):
