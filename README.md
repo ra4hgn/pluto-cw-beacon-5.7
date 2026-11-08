@@ -19,6 +19,16 @@ amateur band (around 5760 MHz).
   | TX Attenuation | 0–60 dB | 10 dB |
 - Baseband sample rate: 1 MHz.
 
+## Screenshots
+
+### Flowgraph
+
+![GNU Radio flowgraph](images/flowgraph.png)
+
+### GUI window
+
+![Beacon control window](images/window.png)
+
 ## Requirements
 
 - GNU Radio 3.10+ with `gr-iio` (PlutoSDR support)
