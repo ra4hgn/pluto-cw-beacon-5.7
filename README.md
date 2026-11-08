@@ -27,7 +27,7 @@ amateur band (around 5760 MHz).
 
 ### GUI window
 
-![Beacon control window](images/window.png)
+![Beacon control window](images/window-v2.png)
 
 ## Requirements
 
