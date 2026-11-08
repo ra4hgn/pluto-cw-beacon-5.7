@@ -1,0 +1,239 @@
+options:
+  parameters:
+    alias: ''
+    author: ''
+    catch_exceptions: 'True'
+    comment: ''
+    copyright: ''
+    description: ''
+    gen_linking: dynamic
+    generate_options: qt_gui
+    generator_class_name: PythonQtGuiGenerator
+    generator_module: gnuradio.grc.workflows.python_qt_gui
+    hier_block_src_path: '.:'
+    id: microvawe_morse_beacon
+    max_nouts: '0'
+    output_language: python
+    qt_qss_theme: ''
+    realtime_scheduling: ''
+    run: 'True'
+    run_command: '{python} -u {filename}'
+    thread_safe_setters: ''
+    title: 'CW Beacon on 5.7 GHz (RA4HGN)'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 8]
+    rotation: 0
+    state: enabled
+
+blocks:
+- name: samp_rate
+  id: variable
+  parameters:
+    comment: ''
+    value: '1000000'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [200, 12]
+    rotation: 0
+    state: enabled
+- name: tone_freq
+  id: variable_qtgui_range
+  parameters:
+    comment: ''
+    gui_hint: 0,0,1,1
+    label: Tone (Hz)
+    min_len: '200'
+    orient: QtCore.Qt.Horizontal
+    rangeType: float
+    start: '300'
+    step: '50'
+    stop: '3000'
+    value: '800'
+    widget: counter_slider
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 200.0]
+    rotation: 0
+    state: enabled
+- name: tx_atten
+  id: variable_qtgui_range
+  parameters:
+    comment: ''
+    gui_hint: 2,0,1,1
+    label: TX Attenuation (dB)
+    min_len: '200'
+    orient: QtCore.Qt.Horizontal
+    rangeType: float
+    start: '0'
+    step: '0.5'
+    stop: '60'
+    value: '10'
+    widget: counter_slider
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 320.0]
+    rotation: 0
+    state: enabled
+- name: tx_freq
+  id: variable_qtgui_range
+  parameters:
+    comment: ''
+    gui_hint: 3,0,1,1
+    label: LO Frequency (MHz)
+    min_len: '200'
+    orient: QtCore.Qt.Horizontal
+    rangeType: float
+    start: '5760'
+    step: '0.01'
+    stop: '5762'
+    value: '5760.1'
+    widget: counter_slider
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [8, 380.0]
+    rotation: 0
+    state: enabled
+- name: wpm
+  id: variable_qtgui_range
+  parameters:
+    comment: ''
+    gui_hint: 1,0,1,1
+    label: Speed (WPM)
+    min_len: '200'
+    orient: QtCore.Qt.Horizontal
+    rangeType: int
+    start: '5'
+    step: '1'
+    stop: '60'
+    value: '20'
+    widget: counter_slider
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [104, 536.0]
+    rotation: 0
+    state: enabled
+- name: analog_sig_source_x_0
+  id: analog_sig_source_x
+  parameters:
+    affinity: ''
+    alias: ''
+    amp: '1'
+    comment: ''
+    freq: tone_freq
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    offset: '0'
+    phase: '0'
+    samp_rate: samp_rate
+    showports: 'False'
+    type: complex
+    waveform: analog.GR_COS_WAVE
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [224, 360.0]
+    rotation: 0
+    state: enabled
+- name: blocks_float_to_complex_0
+  id: blocks_float_to_complex
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [232, 240.0]
+    rotation: 0
+    state: enabled
+- name: blocks_multiply_xx_0
+  id: blocks_multiply_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    num_inputs: '2'
+    type: complex
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [488, 224.0]
+    rotation: 0
+    state: enabled
+- name: epy_block_0
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"\nEmbedded Python Blocks:\n\nEach time this file is saved, GRC will instantiate the first class it finds\nto get ports and parameters of your block. The arguments to __init__  will\nbe the parameters. All of them are required to have default values!\n\"\"\"\nimport numpy as np\nfrom gnuradio import gr\n\nclass blk(gr.sync_block):\n    def __init__(self, wpm=20):\n        gr.sync_block.__init__(\n            self,\n            name='Morse Beacon',\n            in_sig=None,\n            out_sig=[np.float32]\n        )\n        self.message = \"CQ CQ DE BEACON\"\n        self.samp_rate = 1e6   # \u0414\u043e\u043b\u0436\u043d\u043e \u0441\u043e\u0432\u043f\u0430\u0434\u0430\u0442\u044c \u0441 samp_rate \u0432 flowgraph\n        self.morse = {\n            'A':'.-','B':'-...','C':'-.-.','D':'-..','E':'.','F':'..-.',\n            'G':'--.','H':'....','I':'..','J':'.---','K':'-.-','L':'.-..',\n            'M':'--','N':'-.','O':'---','P':'.--.','Q':'--.-','R':'.-.',\n            'S':'...','T':'-','U':'..-','V':'...-','W':'.--','X':'-..-',\n            'Y':'-.--','Z':'--..',' ':' '\n        }\n        self._wpm = wpm\n        self._regenerate()\n\n    @property\n    def wpm(self):\n        return self._wpm\n\n    @wpm.setter\n    def wpm(self, value):\n        self._wpm = value\n        self._regenerate()\n\n    def _regenerate(self):\n        self.dot_samples = int(self.samp_rate * 1.2 / self._wpm)\n        self.samples = self._generate()\n        self.pos = 0\n\n    def _generate(self):\n        dot = self.dot_samples\n        vals = []\n        counts = []\n        for ch in self.message.upper():\n            if ch == ' ':\n                vals.append(0.0)\n                counts.append(dot * 7)\n                continue\n            code = self.morse.get(ch, '')\n            for sym in code:\n                if sym == '.':\n                    vals.append(1.0)\n                    counts.append(dot)\n                elif sym == '-':\n                    vals.append(1.0)\n                    counts.append(dot * 3)\n                vals.append(0.0)\n                counts.append(dot)          # \u043c\u0435\u0436\u0441\u0438\u043c\u0432\u043e\u043b\u044c\u043d\u044b\u0439 \u0438\u043d\u0442\u0435\u0440\u0432\u0430\u043b\n            vals.append(0.0)\n            counts.append(dot * 2)          # \u043c\u0435\u0436\u0431\u0443\u043a\u0432\u0435\u043d\u043d\u044b\u0439 \u0438\u043d\u0442\u0435\u0440\u0432\u0430\u043b\n        return np.repeat(np.asarray(vals, dtype=np.float32),\n                         np.asarray(counts, dtype=np.int64))\n\n    def work(self, input_items, output_items):\n        out = output_items[0]\n        n = len(out)\n        end = self.pos + n\n        if end <= len(self.samples):\n            out[:] = self.samples[self.pos:end]\n        else:\n            wrap = len(self.samples) - self.pos\n            out[:wrap] = self.samples[self.pos:]\n            out[wrap:] = self.samples[:(n - wrap)]\n        self.pos = end % len(self.samples)\n        return n\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    wpm: wpm
+  states:
+    _io_cache: ('Morse Beacon', 'blk', [('wpm', '20')], [], [('0', 'float', 1)], '',
+      ['wpm'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [72, 144.0]
+    rotation: 0
+    state: enabled
+- name: iio_pluto_sink_0
+  id: iio_pluto_sink
+  parameters:
+    affinity: ''
+    alias: ''
+    attenuation1: tx_atten
+    bandwidth: '2000000'
+    buffer_size: '0x8000'
+    comment: ''
+    cyclic: 'False'
+    filter: ''
+    filter_source: '''Auto'''
+    fpass: '0'
+    frequency: round(tx_freq * 1e6)
+    fstop: '0'
+    len_tag_key: ''
+    samplerate: samp_rate
+    type: fc32
+    uri: ''
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [776, 148.0]
+    rotation: 0
+    state: enabled
+
+connections:
+- [analog_sig_source_x_0, '0', blocks_multiply_xx_0, '1']
+- [blocks_float_to_complex_0, '0', blocks_multiply_xx_0, '0']
+- [blocks_multiply_xx_0, '0', iio_pluto_sink_0, '0']
+- [epy_block_0, '0', blocks_float_to_complex_0, '0']
+
+metadata:
+  file_format: 1
+  grc_version: 3.10.12.0
