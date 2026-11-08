@@ -38,7 +38,7 @@ amateur band (around 5760 MHz).
 ## Usage
 
 1. Connect the PlutoSDR over USB.
-2. Open `microvawe_morse_beacon.grc` in GNU Radio Companion and press **Run**
+2. Open `microwave_morse_beacon.grc` in GNU Radio Companion and press **Run**
    (F6).
 
 The device is auto-detected via IIO (`iio.get_pluto_uri()`).
@@ -46,8 +46,8 @@ The device is auto-detected via IIO (`iio.get_pluto_uri()`).
 The Python script is generated from the flowgraph; regenerate and run it with:
 
 ```bash
-grcc microvawe_morse_beacon.grc
-python3 microvawe_morse_beacon.py
+grcc microwave_morse_beacon.grc
+python3 microwave_morse_beacon.py
 ```
 
 ## How it works
@@ -58,13 +58,13 @@ Morse envelope (float, 1 MHz) ──► float_to_complex ─┐
 800 Hz tone (complex, 1 MHz) ───────────────────────┘
 ```
 
-The embedded Python block (`microvawe_morse_beacon_epy_block_0.py`) builds a
+The embedded Python block (`microwave_morse_beacon_epy_block_0.py`) builds a
 float keying envelope (0/1) from a Morse dictionary, then it is up-converted
 to a complex 800 Hz tone and sent to the PlutoSDR.
 
 ## Customising the message
 
-The beacon text is defined in `microvawe_morse_beacon_epy_block_0.py`:
+The beacon text is defined in `microwave_morse_beacon_epy_block_0.py`:
 
 ```python
 self.message = "CQ CQ DE BEACON"

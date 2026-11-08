@@ -11,7 +11,7 @@ options:
     generator_class_name: PythonQtGuiGenerator
     generator_module: gnuradio.grc.workflows.python_qt_gui
     hier_block_src_path: '.:'
-    id: microvawe_morse_beacon
+    id: microwave_morse_beacon
     max_nouts: '0'
     output_language: python
     qt_qss_theme: ''

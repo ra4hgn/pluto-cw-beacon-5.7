@@ -21,5 +21,5 @@ Thumbs.db
 # GNU Radio runtime
 .gnuradio/
 
-# GNU Radio generated flowgraph (regenerate with: grcc microvawe_morse_beacon.grc)
-microvawe_morse_beacon.py
+# GNU Radio generated flowgraph (regenerate with: grcc microwave_morse_beacon.grc)
+microwave_morse_beacon.py
