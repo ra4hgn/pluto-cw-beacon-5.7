@@ -1,81 +1,52 @@
 # CW Beacon on 5.7 GHz (RA4HGN)
 
-A Morse-code (CW) beacon transmitter for the
-[ADALM-PlutoSDR](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html),
-built with [GNU Radio](https://www.gnuradio.org/). It transmits in the 6 cm
-amateur band (around 5760 MHz).
+A Morse-code (CW) beacon for the
+[ADALM-PlutoSDR](https://www.analog.com/en/design-center/evaluation-hardware-and-software/evaluation-boards-kits/adalm-pluto.html).
+It transmits a repeating `CQ CQ DE BEACON` message in the 6 cm amateur band
+(around 5760 MHz).
 
-## Features
+The project ships **two implementations** of the same beacon:
 
-- Repeating Morse message `CQ CQ DE BEACON` (hardcoded, editable).
-- Single-sideband keying: a complex 800 Hz tone, so the signal appears at
-  **LO + tone** (e.g. 5760.1 MHz + 800 Hz) during key-down.
-- Live Qt GUI controls:
-  | Control | Range | Default |
-  |---|---|---|
-  | LO Frequency | 5760–5762 MHz (10 kHz step) | 5760.1 MHz |
-  | Tone | 300–3000 Hz | 800 Hz |
-  | Speed (WPM) | 5–60 | 20 |
-  | TX Attenuation | 0–60 dB | 10 dB |
-- Baseband sample rate: 1 MHz.
+| Version | Where it runs | Use it when |
+|---|---|---|
+| **GNU Radio** (`gnuradio/`) | on a host PC, streams I/Q to the Pluto | you want a GUI, live controls, easy tweaking |
+| **On-target C** (`on-target/`) | directly on the Pluto's ARM CPU (autonomous) | you want a standalone beacon with no PC |
 
 ## Screenshots
 
-### Flowgraph
+| Flowgraph (GNU Radio) | GUI window |
+|---|---|
+| ![flowgraph](images/flowgraph.png) | ![window](images/window-v2.png) |
 
-![GNU Radio flowgraph](images/flowgraph.png)
+## Version 1 — GNU Radio (`gnuradio/`)
 
-### GUI window
+- Complex 800 Hz tone → signal at **LO + 800 Hz**.
+- Live Qt GUI: LO frequency (5760–5762 MHz, 10 kHz step), tone (300–3000 Hz),
+  speed (5–60 WPM), TX attenuation (0–60 dB).
+- Baseband sample rate 1 MHz, streamed to the Pluto over USB.
 
-![Beacon control window](images/window-v2.png)
-
-## Requirements
-
-- GNU Radio 3.10+ with `gr-iio` (PlutoSDR support)
-- ADALM-PlutoSDR
-- Python 3, NumPy, PyQt5
-
-## Usage
-
-1. Connect the PlutoSDR over USB.
-2. Open `microwave_morse_beacon.grc` in GNU Radio Companion and press **Run**
-   (F6).
-
-The device is auto-detected via IIO (`iio.get_pluto_uri()`).
-
-The Python script is generated from the flowgraph; regenerate and run it with:
+Requirements: GNU Radio 3.10+ with `gr-iio`, Python 3, NumPy, PyQt5.
 
 ```bash
-grcc microwave_morse_beacon.grc
-python3 microwave_morse_beacon.py
+cd gnuradio
+grcc microwave_morse_beacon.grc      # optional: regenerate the .py
+python3 microwave_morse_beacon.py    # or open the .grc in GNU Radio Companion
 ```
 
-## How it works
+The transmitted text is defined in
+`gnuradio/microwave_morse_beacon_epy_block_0.py` (`self.message`).
 
-```
-Morse envelope (float, 1 MHz) ──► float_to_complex ─┐
-                                                     ├─► multiply ──► PlutoSDR Sink (LO)
-800 Hz tone (complex, 1 MHz) ───────────────────────┘
-```
+## Version 2 — On-target C (`on-target/`)
 
-The embedded Python block (`microwave_morse_beacon_epy_block_0.py`) builds a
-float keying envelope (0/1) from a Morse dictionary, then it is up-converted
-to a complex 800 Hz tone and sent to the PlutoSDR.
+Autonomous beacon that runs on the Pluto itself, using the FPGA's built-in
+DDS tone generator (no I/Q streaming). Build, upload and run instructions are
+in [`on-target/README.md`](on-target/README.md).
 
-## Customising the message
-
-The beacon text is defined in `microwave_morse_beacon_epy_block_0.py`:
-
-```python
-self.message = "CQ CQ DE BEACON"
-```
-
-Change it and the flowgraph will transmit the new message (letters A–Z and
-spaces are supported).
+The transmitted text is defined in `on-target/beacon.c` (`#define MSG`).
 
 ## License
 
-[GPL-3.0](LICENSE) — see the LICENSE file.
+[GPL-3.0](LICENSE).
 
 ## Author
 
