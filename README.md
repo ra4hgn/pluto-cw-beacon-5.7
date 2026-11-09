@@ -44,30 +44,31 @@ in [`on-target/README.md`](on-target/README.md).
 
 The transmitted text is defined in `on-target/beacon.c` (`#define MSG`).
 
-## Frequency range: AD9363 vs AD9364 (6 GHz)
+## Frequency range: extending the AD9363 to 6 GHz
 
-The beacon transmits at **5760.100 MHz**, which is above the AD9363's official
-**3.8 GHz** limit. The Pluto's silicon can actually tune up to **6 GHz**, but
-the IIO driver only exposes that range when the firmware reports an
-**AD9364** model.
+The ADALM-Pluto uses the **AD9363**, officially limited to **325 MHz – 3.8 GHz**
+— below the beacon's **5760.100 MHz**. That 3.8 GHz cap is a **firmware**
+limit (the device-tree `model` string), not a silicon limit: the AD9363 RF
+front-end actually reaches **6 GHz**.
 
-Check what your unit exposes:
+So the range is first extended with the well-known **"Pluto 6 GHz mod"**:
+change the firmware device-tree `model` from `AD9363` to `AD9364` (either in
+the `plutosdr-fw` sources and rebuild, or patch the DTB inside `pluto.frm`
+with `fdtput`) and reflash. After the mod, `iio_info` reports an AD9364 model
+and exposes the full 6 GHz range:
 
 ```bash
 iio_info -a | grep -E 'hw_model|frequency_available'
 ```
 
-- **Rev.B / Rev.D** report `... (Z7010-AD9364)` and `frequency_available` up
-  to `6000000000` → the 6 GHz range is already enabled, nothing to do
-  (this is the case for the unit this project was built on).
-- **Rev.A / Rev.C** report `... AD9363` and top out at `3800000000` → the
-  range is firmware-limited. To extend it to the AD9361/AD9364 **6 GHz**
-  range, change the device-tree `model` in the Pluto firmware from `AD9363`
-  to `AD9364` (Analog Devices `plutosdr-fw` / Buildroot) and reflash. The
-  silicon supports it — this is the well-known "Pluto 6 GHz mod".
+```
+hw_model: Analog Devices PlutoSDR Rev.B (Z7010-AD9364)
+altvoltage1: TX_LO  frequency_available: [46875001 1 6000000000]
+altvoltage0: RX_LO  frequency_available: [70000000 1 6000000000]
+```
 
-Either way, once `frequency_available` reaches `6000000000`, the beacon on
-5760.100 MHz works.
+This project was developed on an **AD9363** unit with this 6 GHz extension
+applied — that is why the beacon transmits on 5760.100 MHz.
 
 ## License
 
