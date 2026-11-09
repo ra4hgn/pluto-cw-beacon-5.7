@@ -44,6 +44,31 @@ in [`on-target/README.md`](on-target/README.md).
 
 The transmitted text is defined in `on-target/beacon.c` (`#define MSG`).
 
+## Frequency range: AD9363 vs AD9364 (6 GHz)
+
+The beacon transmits at **5760.100 MHz**, which is above the AD9363's official
+**3.8 GHz** limit. The Pluto's silicon can actually tune up to **6 GHz**, but
+the IIO driver only exposes that range when the firmware reports an
+**AD9364** model.
+
+Check what your unit exposes:
+
+```bash
+iio_info -a | grep -E 'hw_model|frequency_available'
+```
+
+- **Rev.B / Rev.D** report `... (Z7010-AD9364)` and `frequency_available` up
+  to `6000000000` → the 6 GHz range is already enabled, nothing to do
+  (this is the case for the unit this project was built on).
+- **Rev.A / Rev.C** report `... AD9363` and top out at `3800000000` → the
+  range is firmware-limited. To extend it to the AD9361/AD9364 **6 GHz**
+  range, change the device-tree `model` in the Pluto firmware from `AD9363`
+  to `AD9364` (Analog Devices `plutosdr-fw` / Buildroot) and reflash. The
+  silicon supports it — this is the well-known "Pluto 6 GHz mod".
+
+Either way, once `frequency_available` reaches `6000000000`, the beacon on
+5760.100 MHz works.
+
 ## License
 
 [GPL-3.0](LICENSE).
