@@ -41,10 +41,10 @@ $(TARGET): $(SRC)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(LDLIBS)
 
 upload: $(TARGET)
-	scp -O $(TARGET) $(PLUTO_USER)@$(PLUTO_IP):/root/
+	scp -O $(TARGET) $(PLUTO_USER)@$(PLUTO_IP):/mnt/jffs2/
 
 run:
-	ssh -t $(PLUTO_USER)@$(PLUTO_IP) /root/$(TARGET)
+	ssh -t $(PLUTO_USER)@$(PLUTO_IP) /mnt/jffs2/$(TARGET)
 
 clean:
 	rm -f $(TARGET)

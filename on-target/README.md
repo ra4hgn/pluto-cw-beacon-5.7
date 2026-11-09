@@ -40,24 +40,52 @@ It uses the Pluto's **built-in DDS tone generator**: the FPGA produces the
    make
    ```
 
-3. Upload and run:
+3. Upload to the Pluto (persistent `/mnt/jffs2`) and run:
 
    ```bash
    make upload
    make run
    ```
 
-Stop with `Ctrl+C`.
+Stop with `Ctrl+C`. See *Autostart on power-up* below to start it on every boot.
 
 ## Autostart on power-up
 
-The Pluto's root filesystem is **read-only**, and `/etc`, `/root` are RAM
-(tmpfs) — **changes are lost on reboot**. Adding an init script will not
-survive a power cycle.
+The Pluto's root filesystem (`/`, `/etc`, `/root`) is a **RAM filesystem**
+(rootfs/ramfs) — changes there are lost on reboot. The only persistent
+writable location is **`/mnt/jffs2`** (JFFS2 on the QSPI flash).
 
-For a truly persistent autostart you must rebuild the Pluto firmware with the
-beacon baked in (Analog Devices `plutosdr-fw` / Buildroot). As a temporary
-workaround, re-upload and start the binary after each boot.
+The stock firmware already provides a persistent autostart hook:
+`/etc/init.d/S98autostart` runs `/mnt/jffs2/autorun.sh` at boot if it exists.
+
+So to start the beacon automatically on every power-up:
+
+1. Upload the binary to the persistent partition:
+
+   ```bash
+   scp -O beacon root@192.168.2.1:/mnt/jffs2/beacon
+   ```
+
+2. On the Pluto (`ssh root@192.168.2.1`) create `/mnt/jffs2/autorun.sh`:
+
+   ```sh
+   chmod +x /mnt/jffs2/beacon
+   cat > /mnt/jffs2/autorun.sh << 'EOF'
+   #!/bin/sh
+   nohup /mnt/jffs2/beacon >/dev/null 2>&1 &
+   EOF
+   chmod +x /mnt/jffs2/autorun.sh
+   ```
+
+3. Reboot and verify:
+
+   ```sh
+   reboot
+   # after it boots:
+   ps | grep beacon
+   ```
+
+No firmware rebuild is needed — `/mnt/jffs2` survives power cycles.
 
 ## Configuration
 
