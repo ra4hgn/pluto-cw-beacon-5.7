@@ -1,7 +1,7 @@
 # On-target CW Beacon (C + libiio, DDS)
 
 Standalone C implementation of the CW beacon that runs **directly on the
-ADALM-PlutoSDR** (AD9364 + Zynq-7010) — no host PC required.
+ADALM-PlutoSDR** (AD9363 + Zynq-7010) — no host PC required.
 
 It uses the Pluto's **built-in DDS tone generator**: the FPGA produces the
 800 Hz tone, and the program only keys it on/off with the Morse timing.
