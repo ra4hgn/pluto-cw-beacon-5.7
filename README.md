@@ -48,14 +48,27 @@ The transmitted text is defined in `on-target/beacon.c` (`#define MSG`).
 
 The ADALM-Pluto uses the **AD9363**, officially limited to **325 MHz – 3.8 GHz**
 — below the beacon's **5760.100 MHz**. That 3.8 GHz cap is a **firmware**
-limit (the device-tree `model` string), not a silicon limit: the AD9363 RF
+limit (the device-tree `compatible` string), not a silicon limit: the AD9363 RF
 front-end actually reaches **6 GHz**.
 
-So the range is first extended with the well-known **"Pluto 6 GHz mod"**:
-change the firmware device-tree `model` from `AD9363` to `AD9364` (either in
-the `plutosdr-fw` sources and rebuild, or patch the DTB inside `pluto.frm`
-with `fdtput`) and reflash. After the mod, `iio_info` reports an AD9364 model
-and exposes the full 6 GHz range:
+The range is extended via the U-Boot environment — connect over SSH and run:
+
+```bash
+ssh root@192.168.2.1
+
+# 1. Tell the driver the chip is an AD9364 (opens 70 MHz – 6 GHz)
+fw_setenv attr_name compatible
+fw_setenv attr_val ad9364
+
+# 2. Enable the second CPU core of the Zynq (faster)
+fw_setenv maxcpus
+
+# 3. Reboot to apply
+reboot
+```
+
+After the reboot, `iio_info` reports an AD9364 model and exposes the full
+6 GHz range:
 
 ```bash
 iio_info -a | grep -E 'hw_model|frequency_available'
