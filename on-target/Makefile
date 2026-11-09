@@ -13,7 +13,7 @@
 #          -DWITH_XML_BACKEND=OFF -DWITH_NETWORK_BACKEND=OFF \
 #          -DWITH_USB_BACKEND=OFF -DWITH_SERIAL_BACKEND=OFF \
 #          -DWITH_IIOD=OFF -DNO_THREADS=ON \
-#          -DWITH_TESTS=OFF -DWITH_DOC=OFF -DWITH_EXAMPLES=OFF -DWITH_MANPAGES=OFF
+#          -DWITH_TESTS=OFF -DWITH_DOC=OFF -DWITH_EXAMPLES=OFF -DWITH_MAN=OFF
 #      make
 # ============================================================
 
