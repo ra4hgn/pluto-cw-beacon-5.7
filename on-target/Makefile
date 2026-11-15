@@ -33,7 +33,10 @@ PLUTO_USER ?= root
 TARGET = beacon
 SRC    = beacon.c
 
-.PHONY: all upload run clean
+# Persistent autostart hook used by /etc/init.d/S98autostart on the Pluto.
+AUTORUN = /mnt/jffs2/autorun.sh
+
+.PHONY: all upload run autostart noautostart clean
 
 all: $(TARGET)
 
@@ -45,6 +48,16 @@ upload: $(TARGET)
 
 run:
 	ssh -t $(PLUTO_USER)@$(PLUTO_IP) /mnt/jffs2/$(TARGET)
+
+# Install the persistent autostart hook (starts the beacon on every boot).
+autostart: $(TARGET) upload
+	ssh $(PLUTO_USER)@$(PLUTO_IP) 'chmod +x /mnt/jffs2/$(TARGET) && \
+		printf "#!/bin/sh\nnohup /mnt/jffs2/$(TARGET) >/dev/null 2>&1 &\n" > $(AUTORUN) && \
+		chmod +x $(AUTORUN)'
+
+# Remove the autostart hook and stop a running beacon.
+noautostart:
+	ssh $(PLUTO_USER)@$(PLUTO_IP) 'rm -f $(AUTORUN); killall $(TARGET) 2>/dev/null || true'
 
 clean:
 	rm -f $(TARGET)

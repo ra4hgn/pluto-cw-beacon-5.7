@@ -58,7 +58,8 @@ writable location is **`/mnt/jffs2`** (JFFS2 on the QSPI flash).
 The stock firmware already provides a persistent autostart hook:
 `/etc/init.d/S98autostart` runs `/mnt/jffs2/autorun.sh` at boot if it exists.
 
-So to start the beacon automatically on every power-up:
+So to start the beacon automatically on every power-up (the `make autostart`
+target does all three steps below):
 
 1. Upload the binary to the persistent partition:
 
@@ -86,6 +87,34 @@ So to start the beacon automatically on every power-up:
    ```
 
 No firmware rebuild is needed — `/mnt/jffs2` survives power cycles.
+
+## Disabling autostart
+
+Autostart is controlled solely by the presence of `/mnt/jffs2/autorun.sh`
+(the stock `/etc/init.d/S98autostart` only runs it if it exists). So to turn
+it off:
+
+```bash
+cd on-target
+make noautostart
+```
+
+This removes `/mnt/jffs2/autorun.sh` and stops `beacon` if it is currently
+running. Equivalently, on the Pluto:
+
+```sh
+rm -f /mnt/jffs2/autorun.sh
+killall beacon          # stop the running instance now
+```
+
+Notes:
+
+- The `beacon` binary itself stays in `/mnt/jffs2` — you can still start it
+  manually with `make run` or `/mnt/jffs2/beacon &`.
+- `killall` only affects the current boot; the next reboot is clean because
+  the hook file is gone.
+- To re-enable autostart later, run `make autostart`, or recreate the hook
+  by hand as shown above.
 
 ## Configuration
 
